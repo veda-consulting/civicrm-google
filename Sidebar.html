@@ -1,0 +1,45 @@
+<!-- Use a templated HTML printing scriptlet to import common stylesheet. -->
+<?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
+
+<!-- Below is the HTML code that defines the sidebar element structure. -->
+<div class="sidebar branding-below">
+  <p>
+   Search civicrm contributions.
+  </p>
+ <!-- <div class="block form-group">
+   <label for="contribution-types">Financial type:</label>
+   <select id="contribution-types">
+     <option value="">- All Financial Types-</option>
+   </select>
+  </div> -->
+  <div id="input-filters" class="block form-group"></div>
+  <div id="option-filters" class="block form-group"></div>
+  
+  <!--
+  <div class="block form-group">
+    <label for="from-date">From:</label>
+    <input type="date" name="from-date">
+  </div>
+  <div class="block form-group">
+    <label for="to-date">To:</label>
+    <input type="date" name="to-date">
+  </div>
+  -->
+  <div class="block" id="sidebar-button-bar">
+    <button id="sidebar-search-button">Search</button>
+    <button id="sidebar-reset-button">Clear</button>
+  </div>
+  <p> </p>
+  <div id="sidebar-status"></div>
+</div>
+
+<!-- Enter sidebar bottom-branding below. -->
+<div class="sidebar bottom">
+  <img alt="Add-on logo" class="logo" width="100"
+      
+      src = "http://drive.google.com/uc?export=view&id=0B1SCaGsx34cranF5endvMGtnT2c">
+  <span class="gray branding-text">CiviCRM - Spreadsheet</span>
+</div>
+<!-- src="https://googledrive.com/host/0B0G1UdyJGrY6XzdjQWF4a1JYY1k/apps-script_2x.png"> -->
+<!-- Use a templated HTML printing scriptlet to import JavaScript. -->
+<?!= HtmlService.createHtmlOutputFromFile('SidebarJavaScript').getContent(); ?>

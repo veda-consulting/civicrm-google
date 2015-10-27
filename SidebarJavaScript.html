@@ -1,0 +1,209 @@
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script>
+
+  $(function() {
+  
+    getinputFilters();
+    getFilters();    
+
+//    filters();
+    // Assign handler functions to sidebar elements here, if needed.
+    $('#sidebar-search-button').click(onSearchClick);
+    $('#sidebar-reset-button').click(onResetClick);
+
+    // Call the server here to retrieve any information needed to build
+    // the dialog, if necessary.
+  });
+  
+  
+  // GET INPUT Filters
+  // get input filters from Code->inputFilters()
+  function getinputFilters(){
+    google.script.run
+      .withSuccessHandler(setInputFilters)
+      .inputFilters();
+  }
+  
+// loop through all input filters and create input fields
+  function setInputFilters(inputFilters){
+    for(var key in inputFilters){
+      var filterName = key;
+      var filterParam = inputFilters[key];
+      
+      var div = $('#input-filters');
+      div.append('<label for="'+filterName+'">'+filterName+':</label>'
+                  +'<input class="filter" type="text"  id="'+filterName+'">'
+                 );                 
+      }
+  }
+  
+  
+  // GET Option Filters
+  // get option filters from Code -> customFilters()
+  function getFilters(){
+     google.script.run
+       .withSuccessHandler(getOptions) // this->getOptions()
+       .withFailureHandler(
+         function(msg, element) {
+          // Respond to failure conditions here.
+          showStatus(msg, 'error');
+          element.disabled = false;
+       })
+       .withUserObject(this)
+       .optionFilters();    
+  }
+ 
+  
+  // loop through all the custom filters and pass filtername and filterParam to this->callFilterOptions()
+  function getOptions(optionFilters){
+     for(var key in optionFilters){
+       var filterName = key;
+       var filterParam = optionFilters[key];
+       callFilterOptions(filterName, filterParam);
+     }
+  }
+  
+  // get filter options from Code->getFilterOptions() and pass them to this->setFilterOptions
+  function callFilterOptions(filterName, filterParam){
+     google.script.run
+       .withSuccessHandler(setFilterOptions) // this->setFilterOptions()
+       .withFailureHandler(
+         function(msg, element) {
+          // Respond to failure conditions here.
+          showStatus(msg, 'error');
+          element.disabled = false;
+       })
+       .withUserObject(this)
+       .getFilterOptions(filterName, filterParam);
+  }  
+  
+  
+  // set filter options on Sidebar
+  function setFilterOptions(filterOptions){
+//  alert('filtersArray in setFilterOptions ::: ' + filterOptions);
+    var filterName = filterOptions[0];
+    var filterArray = filterOptions[1];
+    var valueArray = filterOptions[2];
+    
+//    alert('filtername == ' + filterName);
+//    alert('filterarray === ' +filterArray);
+    var div = $('#option-filters');
+     div.append('<label for="'+filterName+'">'+filterName+':</label>'
+                  +'<select id="'+filterName+'" class="filter">'
+                   +'<option value="">- All -</option>'
+                 +'</select>');
+    var list = $("div select:last-child" );
+
+    for(var key in filterArray){
+      if (filterArray.hasOwnProperty(key)){
+        var option  = filterArray[key];
+//        alert('option' +filterArray[key]);
+        
+        list.append('<option value="'+valueArray[key]+'">'+filterArray[key]+'</option>');               
+      }
+    }
+   
+  } 
+  
+  /// END of INITIAL LOAD Functions
+
+  
+  
+  ///  SEARCH BUTTON function  - get custom Filters and pass it to this->callGetData()
+  function onSearchClick(){
+//    this.disabled = true;
+
+       google.script.run
+       .withSuccessHandler(callGetData) // this->callGetData()
+       .withFailureHandler(
+         function(msg, element) {
+          // Respond to failure conditions here.
+          showStatus(msg, 'error');
+          element.disabled = false;
+       })
+       .withUserObject(this)
+       .allFilters();
+          
+  }
+  
+  
+  
+  // get customFilters and send filter values to code->getData()
+  function callGetData(allFilters){
+  
+    var payloadFilter = '';
+  
+    for(var key in allFilters){
+      var filterName = key;
+      var filterParam = allFilters[key]; 
+
+      var id = '#'+filterName;
+      
+      var value = $(id).val();
+      
+      payloadFilter = payloadFilter+'&'+filterParam+'='+value;
+      
+    }  
+  
+     // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element){
+            // Respond to success conditions here.
+//            showStatus('Contributions list updated', 'success');
+//            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+//            element.disabled = false;
+          })
+        .withUserObject(this)
+        .getData(payloadFilter);
+    
+  }  
+  ///  End of SEARCH BUTTON Click functions
+  
+  
+  // Clear button function
+  function onResetClick(){
+    this.disabled = true;
+    
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element){
+            // Respond to success conditions here.
+//            showStatus('Selelcted contact type: ' + contactType);
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .resetData();
+  }
+  
+  
+  // show error status on sidebar
+  function showStatus(msg, classId) {
+    $('#sidebar-status').removeClass().html(msg);
+    if (classId) {
+      $('#sidebar-status').addClass(classId);
+    }
+  }
+  
+  // hide error message on sidebar
+  function hideStatus(msg){
+   $('#sidebar-status').removeClass().html(msg);
+  }
+  
+  
+  
+</script>
